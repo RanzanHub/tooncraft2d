@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ToonCraft — Vila dos Desenhos</title>
+<style>
+:root{--ink:#24334c;--cream:#fff8df;--pink:#ff77a8;--blue:#56c8ee;--yellow:#ffda58;--purple:#9a79f7;--green:#76d978}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#8ddcf6;font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif;color:var(--ink)}
+#game{position:fixed;inset:0}canvas{width:100%;height:100%;display:block;touch-action:none}
+.panel{background:rgba(255,248,223,.93);border:3px solid var(--ink);border-radius:17px;box-shadow:0 5px 0 rgba(36,51,76,.22);padding:10px 13px}
+#brand{position:absolute;top:14px;left:15px;max-width:min(350px,calc(100vw - 30px));display:flex;gap:11px;align-items:center;pointer-events:none}
+.logo{width:48px;height:48px;flex:none;border:3px solid var(--ink);border-radius:14px;background:var(--yellow);display:grid;place-items:center;font-size:27px;transform:rotate(-5deg);box-shadow:0 3px 0 var(--ink)}
+.brand-title{font-weight:1000;font-size:clamp(15px,2vw,23px);line-height:1.05;letter-spacing:-.7px}.brand-sub{font-size:11px;font-weight:800;opacity:.75;margin-top:4px}
+#stats{position:absolute;top:14px;right:14px;display:flex;gap:8px;align-items:stretch}.stat{min-width:82px;text-align:center;padding:7px 11px}.stat .emoji{font-size:19px;line-height:20px}.stat strong{display:block;font-size:19px;line-height:22px}.stat small{font-size:10px;font-weight:900;letter-spacing:.3px;text-transform:uppercase}
+#mission{position:absolute;top:95px;left:15px;width:220px;max-width:calc(50vw - 20px);font-size:12px;line-height:1.4}.mission-title{font-size:14px;font-weight:1000;margin-bottom:4px}.mission-row{display:flex;gap:6px;align-items:flex-start;margin:3px 0}.dot{width:8px;height:8px;flex:none;margin-top:4px;border-radius:50%;background:var(--pink);border:1.5px solid var(--ink)}
+#help{position:absolute;left:15px;bottom:16px;max-width:min(360px,calc(100vw - 30px));font-size:11px;line-height:1.5}#help b{font-weight:1000}#help .tiny{opacity:.7;font-weight:800;margin-top:4px}
+#hotbar{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:7px;align-items:end;max-width:calc(100vw - 28px)}.slot{width:61px;height:70px;border:3px solid var(--ink);border-radius:13px;background:rgba(255,248,223,.94);box-shadow:0 4px 0 rgba(36,51,76,.24);display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;cursor:pointer;user-select:none;transition:transform .08s}.slot.active{background:#ffec92;transform:translateY(-7px);outline:3px solid #fff;box-shadow:0 6px 0 var(--ink)}.slot .num{position:absolute;top:3px;left:6px;font-size:10px;font-weight:1000}.block-icon{width:26px;height:22px;border:2px solid rgba(36,51,76,.75);transform:skewY(-8deg);border-radius:4px;margin:4px 0 3px;box-shadow:inset -5px -4px rgba(0,0,0,.12)}.slot .name{font-size:10px;font-weight:1000}.slot .count{position:absolute;right:5px;bottom:4px;font-size:10px;font-weight:1000;background:var(--cream);border-radius:5px;padding:0 3px}
+#toast{position:absolute;left:50%;top:18%;transform:translate(-50%,-10px);background:var(--yellow);border:3px solid var(--ink);border-radius:14px;padding:10px 16px;font-weight:1000;box-shadow:0 4px 0 rgba(36,51,76,.25);opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;max-width:85vw;text-align:center}#toast.show{opacity:1;transform:translate(-50%,0)}
+#action{position:absolute;right:14px;bottom:18px;display:flex;gap:8px}.action-btn{border:3px solid var(--ink);border-radius:15px;min-width:78px;padding:10px 12px;background:var(--pink);box-shadow:0 4px 0 var(--ink);font:900 12px inherit;color:var(--ink);cursor:pointer;touch-action:manipulation}.action-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}#gagBtn{background:var(--blue);font-weight:1000}
+#start{position:absolute;inset:0;display:grid;place-items:center;background:rgba(57,124,171,.32);backdrop-filter:blur(3px);z-index:5;transition:opacity .3s}#start.hidden{opacity:0;pointer-events:none}.start-card{width:min(540px,calc(100vw - 28px));text-align:center;padding:26px 24px 22px;background:var(--cream);border:4px solid var(--ink);border-radius:27px;box-shadow:0 10px 0 var(--ink);position:relative}.start-card:before,.start-card:after{content:'✦';position:absolute;color:var(--pink);font-size:28px}.start-card:before{top:14px;left:16px}.start-card:after{right:17px;top:34px;color:var(--blue)}.start-logo{font-size:53px;margin-bottom:4px}.start-card h1{font-size:clamp(27px,5vw,43px);line-height:1;margin:3px 0 8px;letter-spacing:-1.5px}.start-card h1 span{color:#f05e91}.start-card p{font-size:14px;font-weight:700;line-height:1.5;max-width:430px;margin:0 auto 17px}.start-tags{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:12px 0 19px}.tag{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900}.start-btn{border:3px solid var(--ink);border-radius:15px;background:var(--yellow);box-shadow:0 5px 0 var(--ink);padding:13px 24px;font:1000 17px inherit;cursor:pointer;color:var(--ink)}.start-btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}.credits{font-size:10px!important;opacity:.65;margin-top:15px!important;margin-bottom:0!important}
+#minihelp{position:absolute;right:14px;top:96px;text-align:right;font-size:10px;font-weight:900;opacity:.75;max-width:150px;pointer-events:none}
+@media(max-width:700px){#brand{top:9px;left:9px}.logo{width:39px;height:39px;font-size:22px}.brand-sub{display:none}#stats{top:9px;right:9px;gap:4px}.stat{min-width:54px;padding:5px 7px}.stat .emoji{font-size:15px}.stat strong{font-size:15px;line-height:17px}.stat small{font-size:8px}#mission{top:62px;left:9px;width:175px;padding:8px 9px;font-size:10px}.mission-title{font-size:12px}#help{display:none}#hotbar{bottom:10px;gap:4px}.slot{width:48px;height:59px;border-width:2px;border-radius:10px}.slot .name{font-size:8px}.block-icon{width:22px;height:18px;margin:4px 0 2px}.slot.active{transform:translateY(-5px)}#action{right:8px;bottom:84px;flex-direction:column}.action-btn{min-width:0;padding:9px 10px;font-size:11px}#minihelp{top:63px;right:9px;font-size:9px}#toast{top:26%}}
+@media(max-width:430px){#brand .brand-title{font-size:14px}#stats .stat{min-width:48px}#mission{max-width:48vw}#hotbar{left:9px;transform:none;max-width:calc(100vw - 18px);gap:3px}.slot{width:43px}.slot .count{font-size:8px;right:3px}.slot .name{font-size:7px}#action{bottom:82px}}
+</style>
+</head>
+<body>
+<div id="game">
+<canvas id="world" aria-label="Mundo de ToonCraft"></canvas>
+<div id="brand"><div class="logo">🧱</div><div><div class="brand-title">TOONCRAFT <span style="color:#f05e91">★</span></div><div class="brand-sub">VILA DOS DESENHOS · sandbox de blocos</div></div></div>
+<div id="stats">
+  <div class="panel stat"><div class="emoji">🍬</div><strong id="beans">0</strong><small>jujubas</small></div>
+  <div class="panel stat"><div class="emoji">🤖</div><strong id="cogs">0</strong><small>engrenagens</small></div>
+  <div class="panel stat"><div class="emoji">❤️</div><strong id="hp">5</strong><small>energia</small></div>
+</div>
+<div id="mission" class="panel"><div class="mission-title">⭐ Missões da Vila</div><div class="mission-row"><span class="dot"></span><span id="mission1">Colete jujubas espalhadas pela cidade.</span></div><div class="mission-row"><span class="dot" style="background:#56c8ee"></span><span id="mission2">Use sua pegadinha para deter os Cogs!</span></div><div class="mission-row"><span class="dot" style="background:#76d978"></span><span>Construa algo com os blocos coletados.</span></div></div>
+<div id="minihelp">🧭 Explore, construa<br>e devolva a alegria à vila!</div>
+<div id="help" class="panel"><b>⌨️ CONTROLES</b><br><b>WASD / setas</b> mover · <b>clique esquerdo</b> quebrar · <b>clique direito</b> colocar bloco<br><b>1–4</b> escolher bloco · <b>E / Espaço</b> usar jato de água<br><div class="tiny">Dica: os Cogs não gostam de pegadinhas. Chegue perto para acertar!</div></div>
+<div id="hotbar" aria-label="Barra de blocos">
+  <div class="slot active" data-slot="1"><span class="num">1</span><div class="block-icon" style="background:#79d958"></div><span class="name">Grama</span><span class="count" id="count-grass">8</span></div>
+  <div class="slot" data-slot="2"><span class="num">2</span><div class="block-icon" style="background:#a96942"></div><span class="name">Madeira</span><span class="count" id="count-wood">6</span></div>
+  <div class="slot" data-slot="3"><span class="num">3</span><div class="block-icon" style="background:#ed8b80"></div><span class="name">Tijolo</span><span class="count" id="count-brick">6</span></div>
+  <div class="slot" data-slot="4"><span class="num">4</span><div class="block-icon" style="background:#b18bff"></div><span class="name">Doce</span><span class="count" id="count-candy">4</span></div>
+</div>
+<div id="action"><button id="gagBtn" class="action-btn">💦 JATO (E)</button><button id="buildBtn" class="action-btn">🧱 CONSTRUIR</button></div>
+<div id="toast">Bem-vindo à Vila dos Desenhos!</div>
+<div id="start"><div class="start-card"><div class="start-logo">🎨 🧱 🍬</div><h1>TOON<span>CRAFT</span></h1><p>Um mundinho de blocos onde a criatividade encontra o caos cartunesco! Explore uma vila colorida, colete jujubas, construa e mande os Cogs de volta para o escritório.</p><div class="start-tags"><span class="tag">⛏️ Quebre e coloque blocos</span><span class="tag">🤖 Enfrente os Cogs</span><span class="tag">🍬 Colete jujubas</span></div><button class="start-btn" id="playBtn">JOGAR AGORA ▶</button><p class="credits">Protótipo original inspirado em sandbox de blocos e humor cartunesco.</p></div></div>
+</div>
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');
+let W=innerWidth,H=innerHeight,DPR=1,tw=50,th=25,bh=17;
+const N=38;
+const COLORS={grass:'#80d957',wood:'#b87345',brick:'#f08785',candy:'#b693ff',leaf:'#45bc74',stone:'#98a7b6'};
+const inv={grass:8,wood:6,brick:6,candy:4};
+const names={grass:'Grama',wood:'Madeira',brick:'Tijolo',candy:'Doce'};
+let terrain=[],objects=[],buildings=[],beans=[],cogs=[],particles=[];
+let selected='grass',beanCount=0,knocked=0,hp=5,elapsed=0,lastTime=0,attackCooldown=0,damageCooldown=0,toastTimer=0,buildMode=false,started=false;
+const player={x:19.5,y:19.5,speed:4.1,faceX:1,faceY:0,walk:0};
+const keys={};let pointer={x:0,y:0,down:false};let lastBeanHUD=-1,lastCogHUD=-1,lastHpHUD=-1;
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(W*DPR);canvas.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);tw=Math.max(34,Math.min(56,W/19,H/13));th=tw*.5;bh=tw*.34;}
+addEventListener('resize',resize);resize();
+function randSeed(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;}}
+const rand=randSeed(347981);
+function inside(x,y){return x>=0&&y>=0&&x<N&&y<N;}
+function tile(x,y){return inside(x,y)?terrain[y][x]:null;}
+function makeWorld(){
+ terrain=Array.from({length:N},(_,y)=>Array.from({length:N},(_,x)=>({type:'grass',shade:Math.floor(rand()*4)})));
+ objects=[];buildings=[];beans=[];cogs=[];particles=[];
+ // Praça central e ruas em cruz.
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+  if(Math.abs(x-19)<=1||Math.abs(y-19)<=1||(x>=16&&x<=22&&y>=16&&y<=22))terrain[y][x]={type:'path',shade:Math.floor(rand()*3)};
+ }
+ // Pequenos canteiros de água nas bordas.
+ for(let y=2;y<7;y++)for(let x=2;x<7;x++)if((x-4)**2+(y-4)**2<5)terrain[y][x]={type:'water',shade:0};
+ for(let y=29;y<35;y++)for(let x=29;x<35;x++)if((x-32)**2+(y-32)**2<7)terrain[y][x]={type:'water',shade:0};
+ const houseSpots=[[5,7],[10,6],[27,6],[31,11],[5,27],[11,30],[27,29],[30,22],[7,15],[25,14],[14,5],[22,31]];
+ const houseColors=['#ffca57','#f47fa5','#71d4ed','#a88bf5','#ff9d59','#75d878','#fb8f87','#68c5ef','#ffd267','#b48cf2','#ff91b4','#84dca0'];
+ houseSpots.forEach(([x,y],i)=>{
+  if(x<0||y<0||x+2>=N||y+2>=N)return;
+  const b={kind:'building',x,y,color:houseColors[i%houseColors.length],height:2.1+(i%3)*.25,roof:i%3,idx:i};
+  buildings.push(b);objects.push(b);
+  for(let yy=y;yy<y+2;yy++)for(let xx=x;xx<x+2;xx++){terrain[yy][xx]={type:'path',shade:1};}
+ });
+ // Árvores espalhadas, sem bloquear a praça ou o ponto inicial.
+ for(let i=0;i<95;i++){
+  const x=2+Math.floor(rand()*(N-4)),y=2+Math.floor(rand()*(N-4));
+  if(Math.abs(x-19)<4||Math.abs(y-19)<4||!tile(x,y)||tile(x,y).type!=='grass'||isBlockedByBuilding(x,y))continue;
+  if(objects.some(o=>o.kind==='tree'&&o.x===x&&o.y===y))continue;
+  objects.push({kind:'tree',x,y,variant:Math.floor(rand()*3)});
+ }
+ // Algumas pedras/blocos encontrados na natureza.
+ for(let i=0;i<18;i++){
+  const x=3+Math.floor(rand()*(N-6)),y=3+Math.floor(rand()*(N-6));
+  if(tile(x,y)?.type==='grass'&&!isBlockedByBuilding(x,y)&&Math.abs(x-19)+Math.abs(y-19)>6&&!objects.some(o=>o.x===x&&o.y===y))objects.push({kind:'block',x,y,block:i%3===0?'brick':i%3===1?'wood':'stone',natural:true});
+ }
+ // Jujubas iniciais.
+ for(let i=0;i<42;i++)spawnBean();
+ // Cogs do escritório, longe o bastante para começar a explorar.
+ const starts=[[8,19],[29,19],[19,8],[19,29],[10,25],[27,10],[31,29]];
+ starts.forEach((p,i)=>{if(!isBlockedByBuilding(p[0],p[1]))cogs.push({x:p[0]+.5,y:p[1]+.5,hp:i%3===0?3:2,maxHp:i%3===0?3:2,stun:0,attack:0,wander:rand()*5,dir:(rand()-.5)*2,kind:i%3,alive:true,respawn:0});});
+}
+function isBlockedByBuilding(x,y){return buildings.some(b=>x>=b.x&&x<b.x+2&&y>=b.y&&y<b.y+2);}
+function objectAt(x,y){return objects.find(o=>o.kind!=='building'&&o.x===x&&o.y===y)||buildings.find(b=>x>=b.x&&x<b.x+2&&y>=b.y&&y<b.y+2)||null;}
+function occupied(x,y,ignore){if(!inside(Math.floor(x),Math.floor(y)))return true;const t=tile(Math.floor(x),Math.floor(y));if(!t||t.type==='water')return true;const o=objectAt(Math.floor(x),Math.floor(y));if(o&&o!==ignore)return true;return false;}
+function spawnBean(){
+ for(let tries=0;tries<80;tries++){
+  const x=2+Math.floor(rand()*(N-4)),y=2+Math.floor(rand()*(N-4));
+  if(tile(x,y)?.type!=='water'&&!isBlockedByBuilding(x,y)&&!objects.some(o=>o.x===x&&o.y===y)&&Math.abs(x-19)+Math.abs(y-19)>2){beans.push({x:x+.5,y:y+.5,phase:rand()*6,alive:true});return;}
+ }
+}
+makeWorld();
+function cameraProject(x,y,z=0){return{x:W*.5+((x-y)-(player.x-player.y))*tw/2,y:H*.49+((x+y)-(player.x+player.y))*th/2-z*bh};}
+function poly(points,fill,stroke=null,line=1){ctx.beginPath();ctx.moveTo(points[0].x,points[0].y);for(let i=1;i<points.length;i++)ctx.lineTo(points[i].x,points[i].y);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=line;ctx.stroke();}}
+function diamond(x,y,z=0){return[cameraProject(x,y,z),cameraProject(x+1,y,z),cameraProject(x+1,y+1,z),cameraProject(x,y+1,z)];}
+function lerp(a,b,t){return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t};}
+function drawGround(){
+ for(let s=0;s<2*N;s++)for(let x=Math.max(0,s-N+1);x<=Math.min(N-1,s);x++){
+  const y=s-x,tt=tile(x,y);if(!tt)continue;
+  const p=diamond(x,y);let col;
+  if(tt.type==='grass'){const shades=['#83df5e','#7bd453','#88e565','#78cf51'];col=shades[tt.shade%4];}
+  else if(tt.type==='path'){const shades=['#f5d59b','#f8dca8','#f1d09a'];col=shades[tt.shade%3];}
+  else {col='#55c8e2';}
+  poly(p,col,'rgba(39,91,72,.14)',.7);
+  if(tt.type==='grass'&&tt.shade===0){ctx.fillStyle='rgba(255,255,255,.2)';ctx.beginPath();ctx.arc((p[0].x+p[2].x)/2-5,(p[0].y+p[2].y)/2,1.4,0,Math.PI*2);ctx.fill();}
+  if(tt.type==='water'){
+   const cx=(p[0].x+p[2].x)/2,cy=(p[0].y+p[2].y)/2;ctx.strokeStyle='rgba(255,255,255,.65)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx-6,cy);ctx.quadraticCurveTo(cx,cy-4,cx+7,cy);ctx.stroke();
+  }
+ }
+}
+function shadeColor(hex,amt){let h=hex.replace('#','');let n=parseInt(h,16);let r=Math.max(0,Math.min(255,(n>>16)+amt)),g=Math.max(0,Math.min(255,((n>>8)&255)+amt)),b=Math.max(0,Math.min(255,(n&255)+amt));return`rgb(${r},${g},${b})`;}
+function drawVoxel(x,y,z,block){
+ const colors={grass:'#78d34f',wood:'#ba7848',brick:'#eb887f',candy:'#b18bff',stone:'#9aaab8',leaf:'#3ebc73'};const c=colors[block]||'#9aaab8';
+ const top=diamond(x,y,z+1),bottom=diamond(x,y,z);
+ poly([top[1],top[2],bottom[2],bottom[1]],shadeColor(c,-35),'rgba(36,51,76,.4)',1);
+ poly([top[3],top[2],bottom[2],bottom[3]],shadeColor(c,-15),'rgba(36,51,76,.4)',1);
+ poly(top,shadeColor(c,13),'rgba(36,51,76,.45)',1);
+ if(block==='grass'){
+  const p=top[0];ctx.fillStyle='#9cf16f';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(top[1].x,top[1].y);ctx.lineTo(top[1].x,top[1].y+3);ctx.lineTo(p.x,p.y+3);ctx.closePath();ctx.fill();
+ }
+}
+function drawBuilding(b){
+ const h=b.height;const base=[cameraProject(b.x,b.y),cameraProject(b.x+2,b.y),cameraProject(b.x+2,b.y+2),cameraProject(b.x,b.y+2)];
+ const top=[cameraProject(b.x,b.y,h),cameraProject(b.x+2,b.y,h),cameraProject(b.x+2,b.y+2,h),cameraProject(b.x,b.y+2,h)];
+ const c=b.color;
+ poly([top[1],top[2],base[2],base[1]],shadeColor(c,-44),'#34405b',2);
+ poly([top[3],top[2],base[2],base[3]],shadeColor(c,-22),'#34405b',2);
+ // Janelas inclinadas acompanhando a perspectiva das paredes.
+ for(const t of [.25,.57]){
+  const bl=lerp(base[1],base[2],t),tl=lerp(top[1],top[2],t);const br=lerp(base[1],base[2],t+.13),tr=lerp(top[1],top[2],t+.13);
+  const lo=lerp(bl,tl,.40),hi=lerp(bl,tl,.73),lo2=lerp(br,tr,.40),hi2=lerp(br,tr,.73);
+  poly([hi,hi2,lo2,lo],'#b8f1f4','#34405b',1.3);ctx.strokeStyle='#fff9d9';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo((hi.x+lo.x)/2,(hi.y+lo.y)/2);ctx.lineTo((hi2.x+lo2.x)/2,(hi2.y+lo2.y)/2);ctx.stroke();
+ }
+ // Porta na face esquerda.
+ const t=.77,bl=lerp(base[3],base[2],t),tl=lerp(top[3],top[2],t),br=lerp(base[3],base[2],t+.12),tr=lerp(top[3],top[2],t+.12);
+ poly([lerp(bl,tl,.04),lerp(br,tr,.04),lerp(br,tr,.62),lerp(bl,tl,.62)],'#916044','#34405b',1.5);
+ poly(top,c,'#34405b',2);
+ if(b.roof===0){poly([top[0],top[1],lerp(top[1],top[2],.20),lerp(top[0],top[3],.20)],'#fff0a0',null);}
+ // Placa divertida na fachada frontal.
+ const center=lerp(top[3],top[2],.5);ctx.fillStyle='#fff7d4';ctx.strokeStyle='#34405b';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(center.x,center.y+10,9,5,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#f15e8e';ctx.font=`bold ${Math.max(8,tw*.22)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(['★','☀','♥'][b.idx%3],center.x,center.y+10);
+}
+function drawTree(o){
+ drawVoxel(o.x,o.y,0,'wood');
+ if(o.variant===0){drawVoxel(o.x,o.y,1,'leaf');drawVoxel(o.x,o.y,2,'leaf');}
+ else{
+  const p=cameraProject(o.x+.5,o.y+.5,1.9);const r=tw*.38;
+  ctx.fillStyle=o.variant===1?'#45c875':'#54c7b3';ctx.strokeStyle='#267f5a';ctx.lineWidth=2.2;
+  ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.arc(p.x-r*.38,p.y+r*.08,r*.58,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.arc(p.x+r*.38,p.y+r*.12,r*.55,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.beginPath();ctx.arc(p.x-r*.22,p.y-r*.28,r*.2,0,Math.PI*2);ctx.fill();
+ }
+}
+function roundRect(x,y,w,h,r,fill,stroke=null,lw=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}}
+function drawAvatar(x,y,isPlayer=false,kind=0,stun=0,hpNow=0,hpMax=1){
+ const p=cameraProject(x,y);const s=tw/50;
+ ctx.save();ctx.translate(p.x,p.y);ctx.scale(s,s);
+ // sombra
+ ctx.fillStyle='rgba(30,66,67,.22)';ctx.beginPath();ctx.ellipse(0,-1,14,6,0,0,Math.PI*2);ctx.fill();
+ if(isPlayer){
+  const wob=Math.sin(elapsed*11)*Math.min(.9,player.walk*.12);
+  // pernas e tênis
+  roundRect(-9,-17+wob,7,15,3,'#4268b5','#273651',1.5);roundRect(2,-17-wob,7,15,3,'#4268b5','#273651',1.5);
+  roundRect(-12,-7+wob,12,6,3,'#fff4d6','#273651',1.5);roundRect(0,-7-wob,12,6,3,'#fff4d6','#273651',1.5);
+  roundRect(-12,-34,24,22,8,'#45bde8','#273651',2);roundRect(-5,-31,10,15,4,'#fff1ce','#273651',1.5);
+  // orelhas, cabeça e cabelo
+  ctx.fillStyle='#ffad65';ctx.strokeStyle='#273651';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(-11,-46,5,10,-.3,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.ellipse(11,-46,5,10,.3,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(0,-46,16,15,0,0,Math.PI*2);ctx.fillStyle='#ffd0a0';ctx.fill();ctx.stroke();
+  ctx.fillStyle='#56c8ee';ctx.beginPath();ctx.arc(-2,-51,15,Math.PI,Math.PI*2);ctx.lineTo(12,-47);ctx.lineTo(4,-50);ctx.lineTo(-2,-44);ctx.lineTo(-9,-48);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#273651';ctx.beginPath();ctx.ellipse(-5,-45,2,3,0,0,Math.PI*2);ctx.ellipse(5,-45,2,3,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#c96a64';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,-40,4,.12,Math.PI-.12);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-10,-38,3,0,Math.PI*2);ctx.arc(10,-38,3,0,Math.PI*2);ctx.fill();
+ }else{
+  const suit=['#5265b7','#b95b8b','#4d9d79'][kind%3];
+  if(stun>0){ctx.strokeStyle='#ffdb4c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,-42,22,elapsed*4,elapsed*4+Math.PI*1.55);ctx.stroke();ctx.font='bold 15px sans-serif';ctx.fillStyle='#ffdc4f';ctx.fillText('✦',-18,-68);ctx.fillText('✦',16,-63);}
+  roundRect(-12,-33,24,23,5,suit,'#273651',2);roundRect(-4,-31,8,15,2,'#ef4d6a','#273651',1.5);
+  ctx.strokeStyle='#273651';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-9,-14);ctx.lineTo(-12,-4);ctx.moveTo(8,-14);ctx.lineTo(11,-4);ctx.stroke();
+  roundRect(-14,-8,10,5,2,'#4d5365','#273651',1);roundRect(5,-8,10,5,2,'#4d5365','#273651',1);
+  roundRect(-15,-61,30,27,9,'#c8cbd0','#273651',2);roundRect(-19,-53,5,11,2,'#ee696b','#273651',1);roundRect(14,-53,5,11,2,'#ee696b','#273651',1);
+  // olhos grandes e sobrancelhas expressivas
+  ctx.fillStyle='#fff';ctx.strokeStyle='#273651';ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(-6,-49,5,7,0,0,Math.PI*2);ctx.ellipse(6,-49,5,7,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#25334c';ctx.beginPath();ctx.arc(-5,-48,2.4,0,Math.PI*2);ctx.arc(7,-48,2.4,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#273651';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-12,-59);ctx.lineTo(-4,-61);ctx.moveTo(4,-61);ctx.lineTo(12,-59);ctx.stroke();
+  ctx.fillStyle='#f46d70';ctx.beginPath();ctx.arc(0,-39,3,0,Math.PI*2);ctx.fill();
+  // barrinha de energia
+  roundRect(-14,-70,28,4,2,'#4e5362');roundRect(-13,-69,26*(hpNow/hpMax),2,1,'#ff6c7b');
+ }
+ ctx.restore();
+}
+function drawBean(b){const p=cameraProject(b.x,b.y);const bob=Math.sin(elapsed*4+b.phase)*2;ctx.save();ctx.translate(p.x,p.y-8-bob);ctx.rotate(Math.sin(elapsed*2+b.phase)*.12);ctx.fillStyle='#ffdf57';ctx.strokeStyle='#624e7a';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(0,0,5.5,7,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#fff6b3';ctx.beginPath();ctx.ellipse(-1.7,-2,1.5,2.3,-.3,0,Math.PI*2);ctx.fill();ctx.restore();}
+function drawCog(c){if(!c.alive)return;drawAvatar(c.x,c.y,false,c.kind,c.stun,c.hp,c.maxHp);const p=cameraProject(c.x,c.y);ctx.font=`bold ${tw*.25}px sans-serif`;ctx.textAlign='center';ctx.fillStyle='#29364b';ctx.fillText(c.stun>0?'💫':c.kind===0?'INC':c.kind===1?'CIF':'RH',p.x,p.y-tw*1.65);}
+function drawEntityLayer(){
+ const entities=[];
+ objects.forEach(o=>entities.push({depth:o.kind==='building'?o.x+o.y+2:o.x+o.y,kind:'obj',o}));
+ beans.filter(b=>b.alive).forEach(b=>entities.push({depth:b.x+b.y,kind:'bean',o:b}));
+ cogs.filter(c=>c.alive).forEach(c=>entities.push({depth:c.x+c.y,kind:'cog',o:c}));
+ entities.push({depth:player.x+player.y,kind:'player',o:player});entities.sort((a,b)=>a.depth-b.depth);
+ for(const e of entities){const o=e.o;if(e.kind==='obj'){
+  if(o.kind==='building')drawBuilding(o);else if(o.kind==='tree')drawTree(o);else if(o.kind==='block')drawVoxel(o.x,o.y,0,o.block);
+ }else if(e.kind==='bean')drawBean(o);else if(e.kind==='cog')drawCog(o);else drawAvatar(o.x,o.y,true);}
+}
+function worldToTile(sx,sy){const dx=(sx-W*.5)/(tw/2),dy=(sy-H*.49)/(th/2);return{x:Math.floor(player.x+(dx+dy)/2),y:Math.floor(player.y+(dy-dx)/2)};}
+function drawCursor(){if(!started)return;const t=worldToTile(pointer.x,pointer.y);if(!inside(t.x,t.y))return;const p=diamond(t.x,t.y);ctx.save();ctx.lineWidth=2.3;ctx.strokeStyle=buildMode?'#ffcf45':'#fff';ctx.setLineDash([5,3]);ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);p.slice(1).forEach(q=>ctx.lineTo(q.x,q.y));ctx.closePath();ctx.stroke();ctx.restore();}
+function drawScenery(){
+ // Nuvens decorativas no céu, presas à tela para dar profundidade.
+ for(let i=0;i<6;i++){const x=((i*237-elapsed*4)%(W+180)+W+180)%(W+180)-60,y=80+(i%3)*65;ctx.fillStyle='rgba(255,255,255,.32)';ctx.beginPath();ctx.ellipse(x,y,28,10,0,0,Math.PI*2);ctx.ellipse(x+15,y-5,18,13,0,0,Math.PI*2);ctx.ellipse(x-14,y-3,16,11,0,0,Math.PI*2);ctx.fill();}
+}
+function draw(){ctx.clearRect(0,0,W,H);const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#84d8f4');sky.addColorStop(.56,'#b0ecf5');sky.addColorStop(1,'#d7f5d8');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);drawScenery();drawGround();drawEntityLayer();drawCursor();
+ // vinheta de leve contraste nas bordas
+ const g=ctx.createRadialGradient(W*.5,H*.48,Math.min(W,H)*.25,W*.5,H*.48,Math.max(W,H)*.75);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(40,75,97,.12)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+}
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');toastTimer=2.2;}
+function hud(){if(beanCount!==lastBeanHUD){document.getElementById('beans').textContent=beanCount;lastBeanHUD=beanCount;}if(knocked!==lastCogHUD){document.getElementById('cogs').textContent=knocked;lastCogHUD=knocked;}if(hp!==lastHpHUD){document.getElementById('hp').textContent=hp;lastHpHUD=hp;}for(const k of Object.keys(inv)){const el=document.getElementById('count-'+k);if(el)el.textContent=inv[k];}document.querySelectorAll('.slot').forEach(el=>el.classList.toggle('active',el.dataset.slot===String(['grass','wood','brick','candy'].indexOf(selected)+1)));}
+function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+function movePlayer(dx,dy,dt){
+ if(!dx&&!dy){player.walk=Math.max(0,player.walk-dt*7);return;}const len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;player.faceX=dx;player.faceY=dy;player.walk=Math.min(8,player.walk+dt*10);
+ const speed=player.speed*dt;let nx=player.x+dx*speed,ny=player.y+dy*speed;
+ if(!occupied(nx,player.y))player.x=nx;if(!occupied(player.x,ny))player.y=ny;
+ player.x=Math.max(.5,Math.min(N-.5,player.x));player.y=Math.max(.5,Math.min(N-.5,player.y));
+}
+function updateCogs(dt){
+ for(const c of cogs){if(!c.alive){c.respawn-=dt;if(c.respawn<=0){const spots=[[8,19],[29,19],[19,8],[19,29],[10,25],[27,10],[31,29]];let p=spots[Math.floor(rand()*spots.length)];c.x=p[0]+.5;c.y=p[1]+.5;c.hp=c.maxHp;c.alive=true;c.stun=0;}continue;}
+  if(c.stun>0){c.stun-=dt;continue;}const d=distance(c,player);let dx=0,dy=0;
+  if(d<6.8){dx=(player.x-c.x)/(d||1);dy=(player.y-c.y)/(d||1);}else{c.wander+=dt;if(c.wander>2.5){c.wander=0;c.dir=(rand()-.5)*Math.PI*2;}dx=Math.cos(c.dir)*.35;dy=Math.sin(c.dir)*.35;}
+  const sp=d<6.8?1.25:.45;let nx=c.x+dx*sp*dt,ny=c.y+dy*sp*dt;if(!occupied(nx,ny,c)){c.x=nx;c.y=ny;}else{c.dir+=1.4;}
+  c.attack=Math.max(0,c.attack-dt);if(d<.82&&c.attack===0&&damageCooldown<=0){hp--;damageCooldown=1.3;c.attack=1.2;player.x+=(player.x-c.x)*.45;player.y+=(player.y-c.y)*.45;showToast('🤖 Um Cog te acertou! Fuja ou use o jato!');if(hp<=0){hp=5;beanCount=Math.max(0,beanCount-5);player.x=19.5;player.y=19.5;showToast('✨ Você recarregou no QG! Perdeu 5 jujubas.');}}
+ }
+}
+function update(dt){elapsed+=dt;attackCooldown=Math.max(0,attackCooldown-dt);damageCooldown=Math.max(0,damageCooldown-dt);if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)document.getElementById('toast').classList.remove('show');}
+ let dx=0,dy=0;if(keys.KeyW||keys.ArrowUp)dy-=1;if(keys.KeyS||keys.ArrowDown)dy+=1;if(keys.KeyA||keys.ArrowLeft)dx-=1;if(keys.KeyD||keys.ArrowRight)dx+=1;movePlayer(dx,dy,dt);updateCogs(dt);
+ for(const b of beans){if(b.alive&&distance(b,player)<.72){b.alive=false;beanCount++;if(beanCount%5===0)showToast('🍬 Jujubas coletadas! Você está mandando bem!');}}
+ if(beans.filter(b=>b.alive).length<26&&rand()<dt*.8)spawnBean();
+ particles=particles.filter(p=>{p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=25*dt;return p.life>0;});hud();
+}
+function nearestCog(range=3.2){let best=null,bd=range;for(const c of cogs){if(!c.alive)continue;const d=distance(c,player);if(d<bd){bd=d;best=c;}}return best;}
+function useGag(){if(!started)return;if(attackCooldown>0){showToast('💦 O jato está recarregando!');return;}attackCooldown=0.8;const c=nearestCog(3.3);if(!c){showToast('💦 Splash! Chegue mais perto de um Cog.');return;}c.hp--;c.stun=1.1;for(let i=0;i<9;i++)particles.push({x:cameraProject(c.x,c.y).x+(rand()-.5)*24,y:cameraProject(c.x,c.y).y-tw*.9,vx:(rand()-.5)*60,vy:-35-rand()*25,life:.5+rand()*.25});if(c.hp<=0){c.alive=false;c.respawn=12;knocked++;for(let i=0;i<4;i++)beans.push({x:c.x+(rand()-.5)*.7,y:c.y+(rand()-.5)*.7,phase:rand()*6,alive:true});showToast('🎉 Cog derrotado! Ele deixou jujubas para trás.');}else showToast('💦 Acertou! O Cog ficou tonto.');}
+function getReachTile(){const t=worldToTile(pointer.x,pointer.y);if(!inside(t.x,t.y))return null;if(Math.hypot(t.x+.5-player.x,t.y+.5-player.y)>4.3)return null;return t;}
+function mine(){if(!started)return;const t=getReachTile();if(!t){showToast('⛏️ Chegue mais perto para alcançar esse bloco.');return;}let o=objectAt(t.x,t.y);if(o){if(o.kind==='building'){buildings=buildings.filter(b=>b!==o);objects=objects.filter(q=>q!==o);for(let yy=o.y;yy<o.y+2;yy++)for(let xx=o.x;xx<o.x+2;xx++)terrain[yy][xx]={type:'path',shade:1};inv.brick+=3;showToast('🏠 Prédio desmontado em tijolos!');}
+ else if(o.kind==='tree'){objects=objects.filter(q=>q!==o);inv.wood+=2;showToast('🌳 Árvore coletada: +2 madeiras!');}
+ else if(o.kind==='block'){objects=objects.filter(q=>q!==o);if(o.block==='stone')inv.brick++;else inv[o.block]=(inv[o.block]||0)+1;showToast('⛏️ Bloco coletado!');}return;}
+ const tt=tile(t.x,t.y);if(tt&&tt.type==='grass'&&!isBlockedByBuilding(t.x,t.y)){tt.type='path';inv.grass++;showToast('🌱 Grama coletada!');}
+}
+function place(){if(!started)return;const t=getReachTile();if(!t){showToast('🧱 Chegue mais perto para construir.');return;}if(inv[selected]<=0){showToast('😅 Você não tem mais '+names[selected].toLowerCase()+'.');return;}const tt=tile(t.x,t.y);if(!tt||tt.type==='water'||objectAt(t.x,t.y)||isBlockedByBuilding(t.x,t.y)||Math.hypot(t.x+.5-player.x,t.y+.5-player.y)<.85){showToast('🚧 Não dá para colocar um bloco aí.');return;}objects.push({kind:'block',x:t.x,y:t.y,block:selected,placed:true});inv[selected]--;showToast('🧱 '+names[selected]+' colocado!');}
+function selectSlot(n){const arr=['grass','wood','brick','candy'];if(n>=1&&n<=4){selected=arr[n-1];buildMode=true;hud();}}
+canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();pointer.x=(e.clientX-r.left)*W/r.width;pointer.y=(e.clientY-r.top)*H/r.height;});
+canvas.addEventListener('pointerdown',e=>{if(!started)return;const r=canvas.getBoundingClientRect();pointer.x=(e.clientX-r.left)*W/r.width;pointer.y=(e.clientY-r.top)*H/r.height;if(e.button===2){e.preventDefault();place();}else if(e.button===0)mine();});canvas.addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();keys[e.code]=true;if(e.repeat)return;if(/^Digit[1-4]$/.test(e.code))selectSlot(Number(e.code.slice(-1)));if(e.code==='KeyE'||e.code==='Space')useGag();if(e.code==='KeyB'){buildMode=!buildMode;showToast(buildMode?'🧱 Modo de construção ligado.':'⛏️ Modo de construção desligado.');}});
+addEventListener('keyup',e=>{keys[e.code]=false;});document.querySelectorAll('.slot').forEach(el=>el.addEventListener('click',()=>selectSlot(Number(el.dataset.slot))));document.getElementById('gagBtn').addEventListener('click',useGag);document.getElementById('buildBtn').addEventListener('click',()=>{buildMode=!buildMode;showToast(buildMode?'🧱 Clique com o botão direito para colocar blocos.':'⛏️ Modo de construção desligado.');});document.getElementById('playBtn').addEventListener('click',()=>{started=true;document.getElementById('start').classList.add('hidden');showToast('🌈 Explore a vila! WASD para andar, clique para interagir.');});
+function frame(now){const dt=Math.min(.035,(now-(lastTime||now))/1000);lastTime=now;if(started)update(dt);else elapsed+=dt;draw();requestAnimationFrame(frame);}hud();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
